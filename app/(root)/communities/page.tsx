@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 // import Searchbar from "@/components/shared/Searchbar";
 // import Pagination from "@/components/shared/Pagination";
-// import CommunityCard from "@/components/cards/CommunityCard";
+import CommunityCard from "@/components/cards/CommunityCard";
 
 import { fetchUser } from "@/lib/actions/user.actions";
 import { fetchCommunities } from "@/lib/actions/community.actions";
@@ -33,7 +33,7 @@ async function Page({
         {/* <Searchbar routeType='communities' /> */}
       </div>
 
-      {/* <section className='mt-9 flex flex-wrap gap-4'>
+      <section className='mt-9 flex flex-wrap gap-4'>
         {result.communities.length === 0 ? (
           <p className='no-result'>No Result</p>
         ) : (
@@ -53,7 +53,7 @@ async function Page({
         )}
       </section>
 
-      <Pagination
+      {/* <Pagination
         path='communities'
         pageNumber={searchParams?.page ? +searchParams.page : 1}
         isNext={result.isNext}

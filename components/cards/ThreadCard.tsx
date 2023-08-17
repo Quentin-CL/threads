@@ -143,7 +143,7 @@ function ThreadCard({
           </Link>
         </div>
       )}
-
+      
       {!isComment && community && (
         <Link
           href={`/communities/${community.id}`}
