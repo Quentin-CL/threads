@@ -9,6 +9,7 @@ interface Result {
   name: string;
   image: string;
   id: string;
+  likes:[string];
   threads: {
     _id: string;
     text: string;
@@ -29,6 +30,7 @@ interface Result {
         image: string;
       };
     }[];
+    likesCount: number;
   }[];
 }
 
@@ -62,20 +64,23 @@ async function ThreadsTab({ currentUserId, accountId, accountType }: Props) {
           content={thread.text}
           author={
             accountType === "User"
-              ? { name: result.name, image: result.image, id: result.id }
-              : {
+              ? JSON.stringify({ name: result.name, image: result.image, id: result.id })
+              : JSON.stringify({
                   name: thread.author.name,
                   image: thread.author.image,
                   id: thread.author.id,
-                }
+                })
           }
           community={
             accountType === "Community"
-              ? { name: result.name, id: result.id, image: result.image }
-              : thread.community
+              ? JSON.stringify({ name: result.name, id: result.id, image: result.image })
+              : JSON.stringify(thread.community)
           }
           createdAt={thread.createdAt}
-          comments={thread.children}
+          comments={JSON.stringify(thread.children)}
+          likesCount={thread.likesCount}
+          userLikes = {result.likes}
+          currentUser_Id = {accountId}
         />
       ))}
     </section>

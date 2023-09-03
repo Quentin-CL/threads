@@ -19,7 +19,7 @@ async function page({ params }: { params: { id: string } }) {
   if (!userInfo?.onboarded) redirect("/onboarding");
 
   const thread = await fetchThreadById(params.id);
-
+  console.log(userInfo.likes);
   return (
     <section className='relative'>
       <div>
@@ -28,10 +28,12 @@ async function page({ params }: { params: { id: string } }) {
           currentUserId={user.id}
           parentId={thread.parentId}
           content={thread.text}
-          author={thread.author}
-          community={thread.community}
+          author={JSON.stringify(thread.author)}
+          community={JSON.stringify(thread.community)}
           createdAt={thread.createdAt}
-          comments={thread.children}
+          comments={JSON.stringify(thread.children)}
+          likesCount={thread.likesCount}
+          userLikes = {userInfo.likes}
         />
       </div>
 
@@ -42,7 +44,6 @@ async function page({ params }: { params: { id: string } }) {
           currentUserId={JSON.stringify(userInfo._id)}
         />
       </div>
-
       <div className='mt-10'>
         {thread.children.map((childItem: any) => (
           <ThreadCard
@@ -51,11 +52,13 @@ async function page({ params }: { params: { id: string } }) {
             currentUserId={user.id}
             parentId={childItem.parentId}
             content={childItem.text}
-            author={childItem.author}
-            community={childItem.community}
+            author={JSON.stringify(childItem.author)}
+            community={JSON.stringify(childItem.community)}
             createdAt={childItem.createdAt}
-            comments={childItem.children}
+            comments={JSON.stringify(childItem.children)}
             isComment
+            likesCount={childItem.likesCount}
+            userLikes = {userInfo.likes}
           />
         ))}
       </div>

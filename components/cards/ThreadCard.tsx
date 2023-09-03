@@ -1,31 +1,25 @@
+'use client'
 import Image from "next/image";
 import Link from "next/link";
 
 import { formatDateString } from "@/lib/utils";
 import DeleteThread from "../forms/DeleteThread";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { handleLikes } from "@/lib/actions/thread.actions";
 
 interface Props {
   id: string;
   currentUserId: string;
   parentId: string | null;
   content: string;
-  author: {
-    name: string;
-    image: string;
-    id: string;
-  };
-  community: {
-    id: string;
-    name: string;
-    image: string;
-  } | null;
+  author: string;
+  community: string | null;
   createdAt: string;
-  comments: {
-    author: {
-      image: string;
-    };
-  }[];
+  comments: string;
   isComment?: boolean;
+  likesCount: number;
+  userLikes?: [string];
 }
 
 function ThreadCard({
@@ -38,7 +32,35 @@ function ThreadCard({
   createdAt,
   comments,
   isComment,
+  likesCount,
+  userLikes,
 }: Props) {
+  author = JSON.parse(author);
+  comments = JSON.parse(comments);
+  community = community?JSON.parse(community): null;
+  const [isLiked, setIsLiked] = useState(userLikes?.includes(id));
+  const [likeCount, setLikeCount] = useState(likesCount);
+  const pathname = usePathname();
+
+
+  const handleLikeClick = async () => {
+    try {
+      // Appel à la fonction de gestion des likes
+      await handleLikes({
+        id,
+        currentUserId,
+        likesCount,
+        path: pathname
+      });
+
+      // Mise à jour des états de like en direct
+      setIsLiked(!isLiked); // Inverser l'état actuel
+      setLikeCount(prevCount => (isLiked ? prevCount - 1 : prevCount + 1)); // Incrémenter ou décrémenter le compteur
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour des likes :", error);
+    }
+  };
+
   return (
     <article
       className={`flex w-full flex-col rounded-xl ${
@@ -70,14 +92,16 @@ function ThreadCard({
             <p className='mt-2 text-small-regular text-light-2'>{content}</p>
 
             <div className={`${isComment && "mb-10"} mt-5 flex flex-col gap-3`}>
-              <div className='flex gap-3.5'>
+              <div className='flex gap-3.5 items-center'>
                 <Image
-                  src='/assets/heart-gray.svg'
+                  src={`/assets/heart-${isLiked? 'filled' : 'gray' }.svg`}
                   alt='heart'
                   width={24}
                   height={24}
                   className='cursor-pointer object-contain'
+                  onClick={handleLikeClick}
                 />
+                <p className='-ml-2 text-small-regular text-light-2'>{likeCount}</p>
                 <Link href={`/thread/${id}`}>
                   <Image
                     src='/assets/reply.svg'

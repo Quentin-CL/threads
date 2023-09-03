@@ -68,9 +68,8 @@ export async function createThread({ text, author, communityId, path }: Params
     const createdThread = await Thread.create({
       text,
       author,
-      community: communityIdObject, // Assign communityId if provided, or leave it null for personal account
+      community: communityIdObject,
     });
-
     // Update User model
     await User.findByIdAndUpdate(author, {
       $push: { threads: createdThread._id },
@@ -236,5 +235,54 @@ export async function addCommentToThread(
   } catch (err) {
     console.error("Error while adding comment:", err);
     throw new Error("Unable to add comment");
+  }
+}
+
+export async function handleLikes({
+  id,
+  currentUserId,
+  likesCount,
+  path
+}: {
+  id: string;
+  currentUserId: string;
+  likesCount: number | undefined;
+  path: string;
+}) {
+  try {
+    connectToDB();
+
+    const user = await User.findOne({id:currentUserId});
+    const thread = await Thread.findById(id);
+
+    if (!thread) {
+      throw new Error(`Thread with ID ${id} not found.`);
+    }
+
+    const isLiked = user.likes.includes(id);
+
+    if (isLiked) {
+      // User already liked the post, remove the like
+      await User.findOneAndUpdate({id:currentUserId}, {
+        $pull: { likes: id }
+      });
+
+      await Thread.findByIdAndUpdate(id, {
+        $inc: { likesCount: -1 }
+      });
+    } else {
+      // User didn't like the post, add the like
+      await User.findOneAndUpdate({id:currentUserId}, {
+        $push: { likes: id }
+      });
+
+      await Thread.findByIdAndUpdate(id, {
+        $inc: { likesCount: 1 }
+      });
+    }
+
+    revalidatePath(path);
+  } catch (error: any) {
+    throw new Error(`Failed to like/unlike thread: ${error.message}`);
   }
 }

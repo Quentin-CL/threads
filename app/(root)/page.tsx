@@ -1,8 +1,9 @@
+
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
 import ThreadCard from "@/components/cards/ThreadCard";
-// import Pagination from "@/components/shared/Pagination";
+import Pagination from "@/components/shared/Pagination";
 
 import { fetchPosts } from "@/lib/actions/thread.actions";
 import { fetchUser } from "@/lib/actions/user.actions";
@@ -39,21 +40,23 @@ async function Home({
                 currentUserId={user.id}
                 parentId={post.parentId}
                 content={post.text}
-                author={post.author}
-                community={post.community}
+                author={JSON.stringify(post.author)}
+                community={JSON.stringify(post.community)}
                 createdAt={post.createdAt}
-                comments={post.children}
+                comments={JSON.stringify(post.children)}
+                likesCount={post.likesCount}
+                userLikes = {userInfo.likes}
               />
             ))}
           </>
         )}
       </section>
-{/* 
+
       <Pagination
         path='/'
         pageNumber={searchParams?.page ? +searchParams.page : 1}
         isNext={result.isNext}
-      /> */}
+      />
     </>
   );
 }
